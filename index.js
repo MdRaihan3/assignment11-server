@@ -1,16 +1,17 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 require('dotenv').config();
-
 const port = process.env.PORT || 5000;
 const app = express()
 
-
-
 // middleware
+const corsOptions = {origin: ['http://localhost:5173'], credentials: true}
 app.use(express.json());
-app.use(cors())
+app.use(cors(corsOptions))
+app.use(cookieParser())
 
 
 
@@ -33,6 +34,9 @@ async function run() {
         const foodsCollection = client.db('foodDB').collection('Foods')
         const requestsCollection = client.db('foodDB').collection('requests')
 
+        // JWT GENERATE
+        
+
         // request related
         app.post('/requestAdd', async (req, res) => {
             // add in requestsCollection
@@ -46,19 +50,26 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/requestedFood/:email', async (req,res)=>{
+            const email = req.params.email;
+            const query = {requester_email: email}
+            const result = await requestsCollection.find(query).toArray()
+            res.send(result)
+        })
+
         // food related
         app.post('/addFood', async (req, res) => {
             const foodData = req.body;
             const result = await foodsCollection.insertOne(foodData)
             res.send(result)
         })
-// get foods by sorting and search
+        // get foods by sorting and search
         app.get('/all-foods', async (req, res) => {
             const sort = req.query.sort;
             const search = req.query.search;
 
             let query = {}
-            if(search) query = { food_name: { $regex: search, $options: 'i' } }
+            if (search) query = { food_name: { $regex: search, $options: 'i' } }
 
             let options = {}
             if (sort) options = { sort: { expired_date: sort === 'asc' ? 1 : -1 } }
@@ -80,10 +91,30 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/foods/:email', async(req,res)=>{
+        // get foods by email
+        app.get('/foods/:email', async (req, res) => {
             const email = req.params.email;
-            const query = {'donor.donor_email': email}
-            const result =  await foodsCollection.find(query).toArray()
+            const query = { 'donor.donor_email': email }
+            const result = await foodsCollection.find(query).toArray()
+            res.send(result)
+        })
+        // update food
+        app.patch('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const newUpdate = req.body
+            const updateDoc = {
+                $set: newUpdate
+            }
+            const result = await foodsCollection.updateOne(query, updateDoc)
+            res.send(result)
+        })
+
+        // delete food
+        app.delete('/delete/:id', async(req,res) =>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await foodsCollection.deleteOne(query)
             res.send(result)
         })
 
