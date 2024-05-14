@@ -81,14 +81,14 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/requestedFood/:email', async (req, res) => {
+        app.get('/requestedFood/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const query = { requester_email: email }
             const result = await requestsCollection.find(query).toArray()
             res.send(result)
         })
 
-        // food related
+        // food 
         app.post('/addFood', async (req, res) => {
             const foodData = req.body;
             const result = await foodsCollection.insertOne(foodData)
