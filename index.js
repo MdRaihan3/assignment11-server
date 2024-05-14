@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 require('dotenv').config();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT ;
 const app = express()
 
 // middleware
@@ -16,10 +16,10 @@ app.use(cookieParser())
 
 // verity jwt middleware
 const verifyToken = async (req, res, next) => {
-    const token = req?.cookies?.token;
+    const token = req.cookies?.token;
     if (!token) { return res.status(401).send({ message: 'Unauthorized access' }) }
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {return res.status(401).send({ message: 'unauthorized access' })}
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+        if (error) {return res.status(401).send({ message: 'unauthorized access' })}
         req.user = decoded
         next()
     })
@@ -61,7 +61,7 @@ async function run() {
                 .cookie('token', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
                 })
                 .send({ success: true })
         })
@@ -72,7 +72,7 @@ async function run() {
                 .clearCookie('token', {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
                     maxAge: 0
                 })
                 .send({ success: true })
@@ -134,8 +134,8 @@ async function run() {
 
         // get foods by email
         app.get('/foods/:email', verifyToken, async (req, res) => {
-            const tokenEmail = req.user.email;
-            const email = req.params.email;
+            const tokenEmail = req?.user?.email;
+            const email = req?.params?.email;
             if (tokenEmail !== email) return res.status(401).send({ message: 'forbidden access' })
             const query = { 'donor.donor_email': email }
             const result = await foodsCollection.find(query).toArray()
