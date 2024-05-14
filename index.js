@@ -122,17 +122,17 @@ async function run() {
             res.send(result)
         })
 
-        // get foods by email safjlasd;fjasfj
+        // get foods by email
         app.get('/foods/:email', verifyToken, async (req, res) => {
             const tokenEmail = req.user.email;
             const email = req.params.email;
-            if (tokenEmail !== email) return res.status(401).send({ message: 'forbidden access saf' })
+            if (tokenEmail !== email) return res.status(401).send({ message: 'forbidden access' })
             const query = { 'donor.donor_email': email }
             const result = await foodsCollection.find(query).toArray()
             res.send(result)
         })
 
-        // update food
+        // update food asfasdklf
         app.patch('/update/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
