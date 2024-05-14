@@ -8,7 +8,8 @@ const port = process.env.PORT || 5000;
 const app = express()
 
 // middleware
-const corsOptions = { origin: ['http://localhost:5173'], credentials: true }
+const corsOptions = { origin: ['https://rfood-948b8.web.app','https://rfood-948b8.firebaseapp.com','http://localhost:5173'],
+ credentials: true }
 app.use(express.json());
 app.use(cors(corsOptions))
 app.use(cookieParser())
@@ -35,6 +36,15 @@ const client = new MongoClient(uri, {
     }
 });
 
+client
+    .connect()
+    .then(() => {
+        console.log("MongoDB Connected");
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
@@ -51,7 +61,7 @@ async function run() {
                 .cookie('token', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
+                    // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
                 })
                 .send({ success: true })
         })
@@ -62,7 +72,7 @@ async function run() {
                 .clearCookie('token', {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                    // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
                     maxAge: 0
                 })
                 .send({ success: true })
@@ -144,7 +154,7 @@ async function run() {
             res.send(result)
         })
 
-        // delete foodjdflsdjf;
+        // delete food
         app.delete('/delete/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
@@ -153,8 +163,8 @@ async function run() {
         })
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
@@ -163,7 +173,7 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     res.send('RFood is running')
 })
 
