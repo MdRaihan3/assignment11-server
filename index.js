@@ -132,7 +132,7 @@ async function run() {
             res.send(result)
         })
 
-        // update food asfasdklf
+        // update food
         app.patch('/update/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
@@ -144,7 +144,7 @@ async function run() {
             res.send(result)
         })
 
-        // delete food
+        // delete foodjdflsdjf;
         app.delete('/delete/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
