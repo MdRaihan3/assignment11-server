@@ -144,7 +144,7 @@ async function run() {
             res.send(result)
         })
 
-        // delete food
+        // delete food slfjasdlfsadkljfs
         app.delete('/delete/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
